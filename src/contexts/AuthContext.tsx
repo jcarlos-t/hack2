@@ -21,15 +21,26 @@ async function loginHandler(
 	setSession: (value: string) => void,
 ) {
 	const response = await login(loginRequest);
-	setSession(response.data.token);
+	if (response.data?.result?.token) {
+		setSession(response.data.result.token);
+	} else {
+		throw new Error("Token no encontrado en la respuesta");
+	}
 }
 
 async function signupHandler(
 	signupRequest: RegisterRequest,
 	setSession: (value: string) => void,
 ) {
-	const response = await register(signupRequest);
-	setSession(response.data.token);
+	try {
+		// Primero intentamos el registro
+		await register(signupRequest);
+		// Si el registro es exitoso, intentamos hacer login
+		await loginHandler(signupRequest, setSession);
+	} catch (error) {
+		console.error("Error en el proceso de registro:", error);
+		throw error;
+	}
 }
 
 export function AuthProvider(props: { children: ReactNode }) {
