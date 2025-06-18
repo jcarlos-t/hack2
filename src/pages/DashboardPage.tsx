@@ -36,6 +36,8 @@ export default function DashboardPage() {
     return { category: cat.name, total: found?.total ?? 0, id: cat.id };
   });
 
+  const isLoading = loadingCats || loadingSum;
+
   return (
     <div className="min-h-screen p-8 relative flex flex-col justify-center items-center overflow-x-hidden">
       {/* Fondo anime sutil */}

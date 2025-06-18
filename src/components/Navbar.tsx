@@ -30,12 +30,6 @@ export default function Navbar() {
                     <span role="img" aria-label="resumen">📊</span> Resumen
                 </button>
                 <button
-                    onClick={() => navigate("/filtrar")}
-                    className="flex items-center gap-1 hover:bg-white/20 px-3 py-2 rounded-lg font-semibold transition-colors"
-                >
-                    <span role="img" aria-label="filtrar">🔎</span> Filtrar
-                </button>
-                <button
                     onClick={() => navigate("/registrar/gasto")}
                     className="flex items-center gap-1 hover:bg-white/20 px-3 py-2 rounded-lg font-semibold transition-colors"
                 >

@@ -52,7 +52,7 @@ export default function RegistrarGastoPage() {
             setShowSuccess(true);
             setTimeout(() => {
                 navigate("/dashboard");
-            }, 4000);
+            }, 2500);
         } catch {
             alert("Error al guardar el gasto");
             setIsSubmitting(false);
