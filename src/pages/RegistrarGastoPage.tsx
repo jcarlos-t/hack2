@@ -1,32 +1,58 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCategorias } from "@hooks/useCategorias";
 import DinosaurioAhorrador from "@assets/DinosaurioAhorrador.png";
+import { createGasto } from "@services/expenses/createGasto";
+import { GastosRequest } from "@interfaces/gastos/GastosRequest";
+import { CategoriaGasto } from "@interfaces/categorias/CategoriaGasto";
 
 export default function RegistrarGastoPage() {
     const navigate = useNavigate();
-    const { categorias, loading, error } = useCategorias();
+    const { categorias, loading, refreshing, error, refresh } = useCategorias();
 
     const [anio, setAnio] = useState<number | null>(null);
     const [mes, setMes] = useState<number | null>(null);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
-    const [paginaCategoria, setPaginaCategoria] = useState(0);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<CategoriaGasto | null>(null);
+    const [busquedaCategoria, setBusquedaCategoria] = useState("");
     const [amount, setAmount] = useState<number | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const categoriasPorPagina = 5;
-    const totalPaginas = Math.ceil(categorias.length / categoriasPorPagina);
-
-    const categoriasPaginadas = categorias.slice(
-        paginaCategoria * categoriasPorPagina,
-        (paginaCategoria + 1) * categoriasPorPagina
-    );
+    const categoriasFiltradas = useMemo(() => {
+        return categorias.filter(cat => 
+            cat.name.toLowerCase().includes(busquedaCategoria.toLowerCase())
+        );
+    }, [categorias, busquedaCategoria]);
 
     const handleCancelar = () => {
         navigate(-1);
     };
 
-    const handleGuardar = () => {
-        // TODO: implementar envío del gasto al backend con POST /expenses
+    const handleGuardar = async () => {
+        if (!anio || !mes || !categoriaSeleccionada || !amount) {
+            alert("Por favor complete todos los campos");
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+            const gastoRequest: GastosRequest = {
+                year: anio,
+                month: mes,
+                category: {
+                    id: categoriaSeleccionada.id,
+                    name: categoriaSeleccionada.name
+                },
+                amount: amount
+            };
+
+            await createGasto(gastoRequest);
+            navigate(-1);
+        } catch (error) {
+            alert("Error al guardar el gasto. Por favor intente nuevamente.");
+            console.error("Error al guardar el gasto:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const currentYear = new Date().getFullYear();
@@ -41,8 +67,22 @@ export default function RegistrarGastoPage() {
                         Registrar Gasto
                     </h1>
 
-                    {loading && <p>Cargando categorías...</p>}
-                    {error && <p>Error al cargar categorías: {error.message}</p>}
+                    {loading && (
+                        <div className="text-center py-4">
+                            <p className="text-gray-600">Cargando categorías...</p>
+                        </div>
+                    )}
+                    {error && (
+                        <div className="text-center py-4">
+                            <p className="text-red-600">Error al cargar categorías: {error.message}</p>
+                            <button 
+                                onClick={refresh}
+                                className="mt-2 text-primary hover:underline"
+                            >
+                                Intentar nuevamente
+                            </button>
+                        </div>
+                    )}
 
                     <form className="space-y-4">
                         {/* Año */}
@@ -93,40 +133,63 @@ export default function RegistrarGastoPage() {
                         </div>
 
                         {/* Categoría */}
-                        <div>
-                            <label className="block text-gray-700 font-semibold mb-1">Categoría</label>
-                            <select
-                                className="w-full border rounded px-3 py-2"
-                                value={categoriaSeleccionada ?? ""}
-                                onChange={(e) => setCategoriaSeleccionada(Number(e.target.value))}
-                            >
-                                <option value="" disabled>Selecciona una categoría</option>
-                                {categoriasPaginadas.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="h-[200px] flex flex-col">
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="block text-gray-700 font-semibold">Categoría</label>
+                                {!loading && !error && (
+                                    <button
+                                        type="button"
+                                        onClick={refresh}
+                                        className="text-sm text-primary hover:underline"
+                                        disabled={refreshing}
+                                    >
+                                        {refreshing ? "Actualizando..." : "Actualizar categorías"}
+                                    </button>
+                                )}
+                            </div>
+                            
+                            {/* Barra de búsqueda */}
+                            <div className="relative mb-2">
+                                <input
+                                    type="text"
+                                    value={busquedaCategoria}
+                                    onChange={(e) => setBusquedaCategoria(e.target.value)}
+                                    placeholder="Buscar categoría..."
+                                    className="w-full border rounded px-3 py-2 pr-8"
+                                    disabled={loading || refreshing}
+                                />
+                                {busquedaCategoria && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setBusquedaCategoria("")}
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+                            </div>
 
-                            {/* Controles de paginación */}
-                            <div className="flex justify-between items-center mt-2 text-sm text-gray-600">
-                                <button
-                                    type="button"
-                                    className="hover:underline disabled:opacity-30"
-                                    disabled={paginaCategoria === 0}
-                                    onClick={() => setPaginaCategoria((p) => p - 1)}
-                                >
-                                    ⬅ Anterior
-                                </button>
-                                <span>Página {paginaCategoria + 1} de {totalPaginas}</span>
-                                <button
-                                    type="button"
-                                    className="hover:underline disabled:opacity-30"
-                                    disabled={paginaCategoria >= totalPaginas - 1}
-                                    onClick={() => setPaginaCategoria((p) => p + 1)}
-                                >
-                                    Siguiente ➡
-                                </button>
+                            {/* Lista de categorías */}
+                            <div className="flex-1 overflow-y-auto border rounded">
+                                {categoriasFiltradas.length === 0 ? (
+                                    <div className="p-2 text-center text-gray-500">
+                                        No se encontraron categorías
+                                    </div>
+                                ) : (
+                                    categoriasFiltradas.map((cat) => (
+                                        <div
+                                            key={cat.id}
+                                            className={`px-3 py-2 cursor-pointer transition-colors duration-200 ${
+                                                categoriaSeleccionada?.id === cat.id 
+                                                    ? 'bg-primary text-white' 
+                                                    : 'hover:bg-gray-100'
+                                            }`}
+                                            onClick={() => setCategoriaSeleccionada(cat)}
+                                        >
+                                            {cat.name}
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -136,15 +199,17 @@ export default function RegistrarGastoPage() {
                                 type="button"
                                 onClick={handleCancelar}
                                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                                disabled={isSubmitting}
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="button"
                                 onClick={handleGuardar}
-                                className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
+                                className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark disabled:opacity-50"
+                                disabled={isSubmitting}
                             >
-                                Guardar
+                                {isSubmitting ? "Guardando..." : "Guardar"}
                             </button>
                         </div>
                     </form>
