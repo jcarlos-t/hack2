@@ -4,6 +4,10 @@ import { CategorySummaryDTO } from "@interfaces/Expenses";
 import SummaryTile from "@components/SummaryTitle";
 import { useCategorias } from "@hooks/useCategorias";
 
+// importa tus iconos desde assets
+import buscarIcon from "@assets/buscar.png";
+import encontradoIcon from "@assets/encontrado.png";
+
 const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril",
   "Mayo", "Junio", "Julio", "Agosto",
@@ -29,9 +33,12 @@ export default function DashboardPage() {
     return { category: cat.name, total: found?.total ?? 0 };
   });
 
+  const isLoading = loadingCats || loadingSum;
+
   return (
     <div className="min-h-screen p-8 bg-teal-50">
       <div className="space-y-6 max-w-4xl mx-auto">
+        {/* selector de mes */}
         <div className="flex items-center gap-2">
           <label htmlFor="month" className="font-medium text-gray-700">
             Mes:
@@ -55,20 +62,38 @@ export default function DashboardPage() {
           </select>
         </div>
 
-        {loadingCats || loadingSum ? (
-          <p className="py-10 text-center text-gray-500">
-            Cargando datos de {MONTHS[month - 1]}…
-          </p>
+        {isLoading ? (
+          // === ESTADO DE CARGA ===
+          <div className="flex flex-col items-center py-10">
+            <img
+              src={buscarIcon}
+              alt="Buscando…"
+              className="h-20 w-20 animate-spin"
+            />
+            <p className="mt-4 text-gray-500">
+              Buscando datos de {MONTHS[month - 1]}…
+            </p>
+          </div>
         ) : (
-          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {fullData.map(({ category, total }) => (
-              <SummaryTile
-                key={category}
-                category={category}
-                total={total}
+          <>
+            {/* === DATOS ENCONTRADOS === */}
+            <div className="flex justify-center py-6">
+              <img
+                src={encontradoIcon}
+                alt="Datos encontrados"
+                className="h-16 w-16"
               />
-            ))}
-          </section>
+            </div>
+            <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {fullData.map(({ category, total }) => (
+                <SummaryTile
+                  key={category}
+                  category={category}
+                  total={total}
+                />
+              ))}
+            </section>
+          </>
         )}
       </div>
     </div>
