@@ -17,9 +17,12 @@ export const router = createBrowserRouter([
 				path: "auth",
 				children: [
 					{path: "login",    element: <Login /> },
-					{path: "register",    element: <Register /> },
-					{path: "register/gasto",    element: <RegistrarGasto /> }
+					{path: "register",    element: <Register /> }
 				],
+			},
+			{
+				path: "registrar/gasto",
+				element: <RegistrarGasto />
 			},
 			{
 				element: <ProtectedRoute />,
