@@ -5,6 +5,7 @@ import Login      from "@pages/LoginPage";
 import Register   from "@pages/RegisterPage";
 import Dashboard  from "@pages/DashboardPage";
 import NotFound   from "@pages/NotFoundPage";
+import RegistrarGasto   from "@pages/RegistrarGastoPage";
 
 export const router = createBrowserRouter([
 	{
@@ -16,7 +17,8 @@ export const router = createBrowserRouter([
 				path: "auth",
 				children: [
 					{path: "login",    element: <Login /> },
-					{path: "register",    element: <Register /> }
+					{path: "register",    element: <Register /> },
+					{path: "register/gasto",    element: <RegistrarGasto /> }
 				],
 			},
 			{
