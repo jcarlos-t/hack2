@@ -6,6 +6,7 @@ import happy from "@assets/happy.webp";
 import { createGasto } from "@services/expenses/createGasto";
 import { GastosRequest } from "@interfaces/gastos/GastosRequest";
 import { CategoriaGasto } from "@interfaces/categorias/CategoriaGasto";
+import bgDetailsImg from "@assets/images/bg-details.jpg";
 
 export default function RegistrarGastoPage() {
     const navigate = useNavigate();
@@ -74,25 +75,27 @@ export default function RegistrarGastoPage() {
     }
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-            <div className="bg-white rounded-lg shadow-md w-full max-w-5xl flex flex-col md:flex-row overflow-hidden">
+        <main className="min-h-screen flex flex-col items-center justify-center relative px-4 overflow-x-hidden">
+            {/* Fondo decorativo anime */}
+            <img src={bgDetailsImg} alt="anime bg" className="fixed inset-0 w-full h-full object-cover opacity-20 z-0 pointer-events-none select-none" />
+            <div className="bg-white/90 rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden z-10">
                 {/* Formulario */}
-                <div className="w-full md:w-1/2 p-8">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                        Registrar Gasto
+                <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                    <h1 className="text-3xl font-bold text-purple-700 mb-6 text-center flex items-center gap-2">
+                        <span role="img" aria-label="kawaii">🌸</span> Registrar Gasto
                     </h1>
 
                     {loading && (
                         <div className="text-center py-4">
-                            <p className="text-gray-600">Cargando categorías...</p>
+                            <p className="text-purple-400 font-semibold">Cargando categorías...</p>
                         </div>
                     )}
                     {error && (
                         <div className="text-center py-4">
-                            <p className="text-red-600">Error al cargar categorías: {error.message}</p>
+                            <p className="text-red-400 font-semibold">Error al cargar categorías: {error.message}</p>
                             <button 
                                 onClick={refresh}
-                                className="mt-2 text-primary hover:underline"
+                                className="mt-2 text-purple-500 hover:underline"
                             >
                                 Intentar nuevamente
                             </button>
@@ -102,9 +105,9 @@ export default function RegistrarGastoPage() {
                     <form className="space-y-4">
                         {/* Año */}
                         <div>
-                            <label className="block text-gray-700 font-semibold mb-1">Año</label>
+                            <label className="block text-purple-700 font-semibold mb-1">Año</label>
                             <select
-                                className="w-full border rounded px-3 py-2"
+                                className="w-full border-2 border-purple-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-400 bg-white font-semibold"
                                 value={anio ?? ""}
                                 onChange={(e) => setAnio(Number(e.target.value))}
                             >
@@ -117,9 +120,9 @@ export default function RegistrarGastoPage() {
 
                         {/* Mes */}
                         <div>
-                            <label className="block text-gray-700 font-semibold mb-1">Mes</label>
+                            <label className="block text-purple-700 font-semibold mb-1">Mes</label>
                             <select
-                                className="w-full border rounded px-3 py-2"
+                                className="w-full border-2 border-purple-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-400 bg-white font-semibold"
                                 value={mes ?? ""}
                                 onChange={(e) => setMes(Number(e.target.value))}
                             >
@@ -135,14 +138,14 @@ export default function RegistrarGastoPage() {
 
                         {/* Monto */}
                         <div>
-                            <label className="block text-gray-700 font-semibold mb-1">Monto (S/)</label>
+                            <label className="block text-purple-700 font-semibold mb-1">Monto (S/)</label>
                             <input
                                 type="number"
                                 min="0"
                                 step="0.01"
                                 value={amount ?? ""}
                                 onChange={(e) => setAmount(parseFloat(e.target.value))}
-                                className="w-full border rounded px-3 py-2"
+                                className="w-full border-2 border-purple-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-400 bg-white font-semibold"
                                 placeholder="Ingresa el monto gastado"
                             />
                         </div>
@@ -150,19 +153,18 @@ export default function RegistrarGastoPage() {
                         {/* Categoría */}
                         <div className="h-[200px] flex flex-col">
                             <div className="flex justify-between items-center mb-1">
-                                <label className="block text-gray-700 font-semibold">Categoría</label>
+                                <label className="block text-purple-700 font-semibold">Categoría</label>
                                 {!loading && !error && (
                                     <button
                                         type="button"
                                         onClick={refresh}
-                                        className="text-sm text-primary hover:underline"
+                                        className="text-sm text-purple-500 hover:underline"
                                         disabled={refreshing}
                                     >
                                         {refreshing ? "Actualizando..." : "Actualizar categorías"}
                                     </button>
                                 )}
                             </div>
-                            
                             {/* Barra de búsqueda */}
                             <div className="relative mb-2">
                                 <input
@@ -170,34 +172,33 @@ export default function RegistrarGastoPage() {
                                     value={busquedaCategoria}
                                     onChange={(e) => setBusquedaCategoria(e.target.value)}
                                     placeholder="Buscar categoría..."
-                                    className="w-full border rounded px-3 py-2 pr-8"
+                                    className="w-full border-2 border-purple-200 rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-purple-400 bg-white font-semibold"
                                     disabled={loading || refreshing}
                                 />
                                 {busquedaCategoria && (
                                     <button
                                         type="button"
                                         onClick={() => setBusquedaCategoria("")}
-                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-700"
                                     >
                                         ✕
                                     </button>
                                 )}
                             </div>
-
                             {/* Lista de categorías */}
-                            <div className="flex-1 overflow-y-auto border rounded">
+                            <div className="flex-1 overflow-y-auto border-2 border-purple-100 rounded-lg bg-white/80">
                                 {categoriasFiltradas.length === 0 ? (
-                                    <div className="p-2 text-center text-gray-500">
+                                    <div className="p-2 text-center text-purple-300">
                                         No se encontraron categorías
                                     </div>
                                 ) : (
                                     categoriasFiltradas.map((cat) => (
                                         <div
                                             key={cat.id}
-                                            className={`px-3 py-2 cursor-pointer transition-colors duration-200 ${
+                                            className={`px-3 py-2 cursor-pointer transition-colors duration-200 rounded-lg font-semibold ${
                                                 categoriaSeleccionada?.id === cat.id 
-                                                    ? 'bg-primary text-white' 
-                                                    : 'hover:bg-gray-100'
+                                                    ? 'bg-purple-400 text-white' 
+                                                    : 'hover:bg-purple-50 text-purple-700'
                                             }`}
                                             onClick={() => setCategoriaSeleccionada(cat)}
                                         >
@@ -209,11 +210,11 @@ export default function RegistrarGastoPage() {
                         </div>
 
                         {/* Botones */}
-                        <div className="flex justify-between mt-6">
+                        <div className="flex justify-between mt-6 gap-2">
                             <button
                                 type="button"
                                 onClick={handleCancelar}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                                className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 font-bold shadow-sm transition-colors"
                                 disabled={isSubmitting}
                             >
                                 Cancelar
@@ -221,7 +222,7 @@ export default function RegistrarGastoPage() {
                             <button
                                 type="button"
                                 onClick={handleGuardar}
-                                className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark disabled:opacity-50"
+                                className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 font-bold shadow-md transition-colors disabled:opacity-50"
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? "Guardando..." : "Guardar"}
@@ -230,12 +231,12 @@ export default function RegistrarGastoPage() {
                     </form>
                 </div>
 
-                {/* Imagen decorativa */}
-                <div className="hidden md:block md:w-1/2 bg-gray-50">
+                {/* Imagen decorativa kawaii */}
+                <div className="hidden md:flex md:w-1/2 bg-purple-50 flex-col items-center justify-center relative">
                     <img
                         src={DinosaurioAhorrador}
                         alt="Dinosaurio Ahorrador"
-                        className="object-cover h-full w-full"
+                        className="object-contain h-64 w-full drop-shadow-xl mt-8"
                     />
                 </div>
             </div>

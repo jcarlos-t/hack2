@@ -6,6 +6,7 @@ import Register   from "@pages/RegisterPage";
 import Dashboard  from "@pages/DashboardPage";
 import NotFound   from "@pages/NotFoundPage";
 import RegistrarGasto   from "@pages/RegistrarGastoPage";
+import ExpenseDetailsPage from "@pages/ExpenseDetailsPage";
 
 export const router = createBrowserRouter([
 	{
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
 					{path: "dashboard",    element: <Dashboard /> },
 					{path: "registrar/gasto", element: <RegistrarGasto /> }
 				],
+			},
+			{
+				path: "expenses/details",
+				element: <ExpenseDetailsPage />
 			},
 			{
 				path: "*", element: <NotFound />
