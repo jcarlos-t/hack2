@@ -32,9 +32,11 @@ export default function Gastos() {
           value={month}
           onChange={(e) => setMonth(Number(e.target.value))}
           className="
-            px-3 py-1 border border-gray-300 rounded
-            focus:outline-none focus:ring-2 focus:ring-indigo-500
-          "
+             px-3 py-1
+              border border-emerald-700
+              rounded
+              focus:outline-none focus:ring-2 focus:ring-emerald-400
+            "
         >
           {MONTHS.map((m, i) => (
             <option key={i} value={i + 1}>
