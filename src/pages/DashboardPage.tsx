@@ -4,9 +4,7 @@ import { CategorySummaryDTO } from "@interfaces/Expenses";
 import SummaryTile from "@components/SummaryTitle";
 import { useCategorias } from "@hooks/useCategorias";
 
-// importa tus iconos desde assets
-import buscarIcon from "@assets/buscar.png";
-import encontradoIcon from "@assets/encontrado.png";
+import buscarIcon from "@assets/buscar.png"; 
 
 const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril",
@@ -38,7 +36,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen p-8 bg-teal-50">
       <div className="space-y-6 max-w-4xl mx-auto">
-        {/* selector de mes */}
         <div className="flex items-center gap-2">
           <label htmlFor="month" className="font-medium text-gray-700">
             Mes:
@@ -63,37 +60,26 @@ export default function DashboardPage() {
         </div>
 
         {isLoading ? (
-          // === ESTADO DE CARGA ===
           <div className="flex flex-col items-center py-10">
+            <p className="mt-4 text-gray-500">
+              Cargando datos de {MONTHS[month - 1]}…
+            </p>
             <img
               src={buscarIcon}
-              alt="Buscando…"
-              className="h-20 w-20 animate-spin"
+              alt="Cargando…"
+              className="w-[300px] h-[300px]"
             />
-            <p className="mt-4 text-gray-500">
-              Buscando datos de {MONTHS[month - 1]}…
-            </p>
           </div>
         ) : (
-          <>
-            {/* === DATOS ENCONTRADOS === */}
-            <div className="flex justify-center py-6">
-              <img
-                src={encontradoIcon}
-                alt="Datos encontrados"
-                className="h-16 w-16"
+          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {fullData.map(({ category, total }) => (
+              <SummaryTile
+                key={category}
+                category={category}
+                total={total}
               />
-            </div>
-            <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {fullData.map(({ category, total }) => (
-                <SummaryTile
-                  key={category}
-                  category={category}
-                  total={total}
-                />
-              ))}
-            </section>
-          </>
+            ))}
+          </section>
         )}
       </div>
     </div>
