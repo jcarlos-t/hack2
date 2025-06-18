@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCategorias } from "@hooks/useCategorias";
 import DinosaurioAhorrador from "@assets/DinosaurioAhorrador.png";
+import happy from "@assets/happy.webp";
 import { createGasto } from "@services/expenses/createGasto";
 import { GastosRequest } from "@interfaces/gastos/GastosRequest";
 import { CategoriaGasto } from "@interfaces/categorias/CategoriaGasto";
@@ -16,6 +17,7 @@ export default function RegistrarGastoPage() {
     const [busquedaCategoria, setBusquedaCategoria] = useState("");
     const [amount, setAmount] = useState<number | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const categoriasFiltradas = useMemo(() => {
         return categorias.filter(cat => 
@@ -46,17 +48,30 @@ export default function RegistrarGastoPage() {
             };
 
             await createGasto(gastoRequest);
-            navigate(-1);
-        } catch (error) {
-            alert("Error al guardar el gasto. Por favor intente nuevamente.");
-            console.error("Error al guardar el gasto:", error);
-        } finally {
+            setShowSuccess(true);
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 4000);
+        } catch {
+            alert("Error al guardar el gasto");
             setIsSubmitting(false);
         }
     };
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 6 }, (_, i) => currentYear - 5 + i);
+
+    if (showSuccess) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                    <img src={happy} alt="Éxito" className="w-64 h-64 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-green-600 mb-2">¡Gasto registrado con éxito!</h2>
+                    <p className="text-gray-600">Redirigiendo al dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">

@@ -4,7 +4,7 @@ import { CategorySummaryDTO } from "@interfaces/Expenses";
 import SummaryTile from "@components/SummaryTitle";
 import { useCategorias } from "@hooks/useCategorias";
 
-import buscarIcon from "@assets/buscar.png"; 
+import buscarIcon from "@assets/pensive.webp"; 
 
 const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril",
