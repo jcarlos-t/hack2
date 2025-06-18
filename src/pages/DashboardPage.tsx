@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMonthlySummary } from "@services/expenses";
 import { CategorySummaryDTO } from "@interfaces/Expenses";
 import SummaryTile from "@components/SummaryTitle";
 import { useCategorias } from "@hooks/useCategorias";
-
-// importa tus iconos desde assets
-import buscarIcon from "@assets/buscar.png";
-import encontradoIcon from "@assets/encontrado.png";
+import bgAnimeImg from "@assets/images/bg-anime.jpg";
+import avatarImg from "@assets/images/avatar.png";
 
 const MONTHS = [
-  "Enero", "Febrero", "Marzo", "Abril",
-  "Mayo", "Junio", "Julio", "Agosto",
-  "Septiembre", "Octubre", "Noviembre", "Diciembre",
+  "Enero","Febrero","Marzo","Abril",
+  "Mayo","Junio","Julio","Agosto",
+  "Septiembre","Octubre","Noviembre","Diciembre",
 ];
 
 export default function DashboardPage() {
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const { categorias, loading: loadingCats } = useCategorias();
+  const navigate = useNavigate();
+
   const [summary, setSummary] = useState<CategorySummaryDTO[]>([]);
-  const [loadingSum, setLoadingSum] = useState<boolean>(true);
+  const [loadingSum, setLoadingSum] = useState(true);
 
   useEffect(() => {
     setLoadingSum(true);
@@ -30,70 +31,58 @@ export default function DashboardPage() {
 
   const fullData = categorias.map((cat) => {
     const found = summary.find((s) => s.category === cat.name);
-    return { category: cat.name, total: found?.total ?? 0 };
+    return { category: cat.name, total: found?.total ?? 0, id: cat.id };
   });
 
-  const isLoading = loadingCats || loadingSum;
-
   return (
-    <div className="min-h-screen p-8 bg-teal-50">
-      <div className="space-y-6 max-w-4xl mx-auto">
-        {/* selector de mes */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="month" className="font-medium text-gray-700">
-            Mes:
+    <div className="min-h-screen p-8 relative flex flex-col justify-center items-center overflow-x-hidden">
+      {/* Fondo anime sutil */}
+      <img src={bgAnimeImg} alt="anime bg" className="fixed inset-0 w-full h-full object-cover opacity-20 z-0 pointer-events-none select-none" />
+      {/* Decoración kawaii */}
+      <img src={avatarImg} alt="kawaii decor" className="absolute left-0 top-0 w-32 opacity-10 pointer-events-none select-none hidden md:block" />
+      <div className="space-y-6 max-w-4xl mx-auto z-10 w-full">
+        <div className="flex items-center gap-2 bg-white/80 rounded-xl p-4 shadow-lg">
+          <label htmlFor="month" className="font-medium text-purple-700 flex items-center gap-2">
+            <span role="img" aria-label="mes">🗓️</span> Mes:
           </label>
           <select
             id="month"
             value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
+            onChange={(e) => setMonth(+e.target.value)}
             className="
-              px-3 py-2
-              border border-teal-700 rounded
-              bg-white
-              focus:outline-none focus:ring-2 focus:ring-teal-400
+              border border-purple-300 rounded px-3 py-2
+              focus:outline-none focus:ring-2 focus:ring-purple-400
+              bg-white shadow-sm font-semibold text-purple-700
+              hover:bg-purple-50 transition-colors
             "
           >
             {MONTHS.map((m, i) => (
-              <option key={i} value={i + 1}>
+              <option key={i} value={i + 1} className="text-purple-700">
                 {m}
               </option>
             ))}
           </select>
+          <span className="ml-4 text-xs text-purple-400 animate-pulse">¡Elige tu mes favorito!</span>
         </div>
 
-        {isLoading ? (
-          // === ESTADO DE CARGA ===
-          <div className="flex flex-col items-center py-10">
-            <img
-              src={buscarIcon}
-              alt="Buscando…"
-              className="h-20 w-20 animate-spin"
-            />
-            <p className="mt-4 text-gray-500">
-              Buscando datos de {MONTHS[month - 1]}…
-            </p>
+        {loadingCats || loadingSum ? (
+          <div className="py-10 text-center text-purple-400 flex flex-col items-center">
+            <svg className="w-16 h-16 animate-bounce mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            <p className="text-lg">Cargando datos de {MONTHS[month - 1]}…</p>
           </div>
         ) : (
-          <>
-            {/* === DATOS ENCONTRADOS === */}
-            <div className="flex justify-center py-6">
-              <img
-                src={encontradoIcon}
-                alt="Datos encontrados"
-                className="h-16 w-16"
+          <section className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {fullData.map(({ category, total, id }) => (
+              <SummaryTile
+                key={category}
+                category={category}
+                total={total}
+                onClick={() => navigate(`/expenses/details?month=${month}&categoryId=${id}`)}
               />
-            </div>
-            <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {fullData.map(({ category, total }) => (
-                <SummaryTile
-                  key={category}
-                  category={category}
-                  total={total}
-                />
-              ))}
-            </section>
-          </>
+            ))}
+          </section>
         )}
       </div>
     </div>
