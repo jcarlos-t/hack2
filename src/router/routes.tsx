@@ -21,16 +21,10 @@ export const router = createBrowserRouter([
 				],
 			},
 			{
-				path: "registrar/gasto",
-				element: <RegistrarGasto />
-			},
-			{
 				element: <ProtectedRoute />,
 				children: [
 					{path: "dashboard",    element: <Dashboard /> },
-					// {}, 
-					// {}, 
-					// {}
+					{path: "registrar/gasto", element: <RegistrarGasto /> }
 				],
 			},
 			{

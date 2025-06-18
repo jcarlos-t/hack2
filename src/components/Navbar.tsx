@@ -6,7 +6,7 @@ export default function Navbar() {
     const handleLogout = () => {
         // Aquí puedes delegar a la lógica de Logout.ts o limpiar token directamente
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/auth/login");
     };
 
     return (
